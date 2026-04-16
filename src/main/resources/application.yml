@@ -1,0 +1,16 @@
+aws:
+  region: ap-southeast-1
+  s3:
+    bucket: rostrlink-avatars-dev
+    cloudfront-base-url: https://dxxxxx.cloudfront.net
+  ses:
+    from: no-reply@yourdomain.com
+
+spring:
+  profiles:
+    active: dev
+
+# Optional: localstack for dev
+localstack:
+  enabled: false
+  endpoint: http://localhost:4566
