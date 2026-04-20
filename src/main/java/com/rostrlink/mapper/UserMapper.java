@@ -3,7 +3,7 @@ package com.rostrlink.mapper;
 import com.rostrlink.dto.request.UserCreateRequest;
 import com.rostrlink.dto.request.UserUpdateRequest;
 import com.rostrlink.dto.response.UserResponse;
-import com.rostrlink.entity.User;
+import com.rostrlink.entity.auth.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

@@ -1,0 +1,54 @@
+Section,ID,Title,Preconditions,Steps,Expected Result
+Purpose,,,,"This document defines test scenarios for the Authentication & Authorization module of RostrLink.",""
+Scope,,,,In scope: login, logout, forgot password, OTP verification, password reset, kiosk PIN login, NFC scan login, session validation via Redis, rate limiting, device fingerprint binding, role and scope loading,""
+Scope,,,,Out of scope: full CRUD for school domain entities, UI testing, performance/load testing, third-party SMS provider integration, external email infrastructure validation beyond local mail test,""
+Environment,,,,"Required services: PostgreSQL 16, Redis 7, MailHog, Spring Boot application.",""
+Environment,,,,"Recommended tools: IntelliJ IDEA run configuration, Postman or IntelliJ HTTP Client, Docker Compose for local infrastructure.",""
+Preconditions,,,,"Database and Redis are running; Flyway migrations are applied; test user accounts exist; MailHog is available for OTP email verification.",""
+FT-01,FT-01,Login success,"User account exists and is active; correct password is known","Send POST /auth/login with valid identifier and password; include browser/device headers if required","HTTP 200; response contains success envelope; session cookie is set; session is stored in Redis; login response includes user info, roles, and scope"
+FT-02,FT-02,Login failure with wrong password,"Active user account exists","Send POST /auth/login with valid identifier and wrong password","HTTP 401; error code indicates invalid credentials; failed login attempt is recorded; no session cookie is created"
+FT-03,FT-03,Login failure with unknown user,"No account exists for the provided email","Send POST /auth/login with unknown identifier and any password","HTTP 401; error is generic and does not reveal user existence; no session is created"
+FT-04,FT-04,Account lockout after repeated failures,"Active user account exists; lockout threshold is configured","Send repeated login requests with wrong password until threshold is exceeded","User becomes locked; subsequent login attempts return HTTP 403; response indicates account locked; lockout timestamp is set in the database"
+FT-05,FT-05,Login success after unlock period,"User account was previously locked; lockout time has expired or account was manually unlocked","Send POST /auth/login with valid identifier and correct password","HTTP 200; user can log in successfully; session cookie is created again"
+FT-06,FT-06,Logout,"User is logged in; session cookie is present","Send POST /auth/logout","HTTP 200; session is removed from Redis; session cookie is cleared; persistent session record is marked revoked if stored in DB"
+FT-07,FT-07,Access current session info,"User is logged in","Send GET /auth/me","HTTP 200; current session data is returned; user information, roles, and scope are present"
+FT-08,FT-08,Forgot password request,"User account exists; MailHog is running","Send POST /auth/forgot-password with registered email and email channel","HTTP 200; response does not reveal whether account exists; OTP token is created; email is received in MailHog"
+FT-09,FT-09,OTP verification success,"OTP was generated for the user; OTP is still valid","Send POST /auth/verify-otp with email, OTP, and correct purpose","HTTP 200; OTP is marked as used; response indicates verification success"
+FT-10,FT-10,OTP verification failure,"OTP exists or test generates one","Send POST /auth/verify-otp with invalid or expired OTP","HTTP 400; error code indicates invalid OTP; OTP remains unusable"
+FT-11,FT-11,Password reset success,"Valid OTP exists for password reset; user account exists","Send POST /auth/reset-password with email, valid OTP, and new password","HTTP 200; password hash is updated; failed attempt count is reset; lock status is cleared; all existing sessions are revoked"
+FT-12,FT-12,Password reset failure with invalid OTP,"User account exists","Send POST /auth/reset-password with invalid OTP","HTTP 400; password is not changed; no sessions are revoked"
+FT-13,FT-13,Kiosk PIN login success,"Kiosk account exists; valid PIN is known","Send POST /auth/kiosk/pin-login with kiosk ID and correct PIN","HTTP 200; kiosk session is created; kiosk TTL is applied; session cookie is set"
+FT-14,FT-14,Kiosk PIN login failure,"Kiosk account exists","Send POST /auth/kiosk/pin-login with kiosk ID and wrong PIN","HTTP 401; no session is created; failed attempt is recorded"
+FT-15,FT-15,NFC scan login success,"NFC tag exists and is active; NFC tag is linked to a user","Send POST /auth/kiosk/nfc-scan with kiosk ID and valid tag code","HTTP 200; kiosk session is created; returned session is associated with the linked user"
+FT-16,FT-16,NFC scan login failure,"NFC tag is revoked or invalid","Send POST /auth/kiosk/nfc-scan with kiosk ID and invalid tag code","HTTP 401; no session is created"
+FT-17,FT-17,Device fingerprint mismatch,"User has an active session; session is bound to a device fingerprint","Login from device A; reuse same session cookie from device B with different fingerprint headers; access a protected endpoint","HTTP 403; request is rejected; session may remain revoked depending on implementation"
+FT-18,FT-18,Session expiration,"A session exists with a short TTL","Wait until the session expires; send a protected request using the old cookie","HTTP 401; session is treated as expired; access is denied"
+FT-19,FT-19,Rate limit by IP,"Rate limit configuration is enabled","Send many login requests from the same IP within the configured window","HTTP 429; further requests are blocked temporarily; response indicates rate limit exceeded"
+FT-20,FT-20,Validation error handling,"Endpoint validation is enabled","Send malformed or incomplete JSON to a validated endpoint; e.g. missing required email or password","HTTP 400; validation error details are returned; no session or database changes occur"
+AT-01,AT-01,Role loading for active user,"User has one or more active roles","Log in as the user; inspect returned roles","Active roles are returned; scope is loaded correctly; inactive roles are excluded"
+AT-02,AT-02,Context scope loaded for user,"User has scoped role data in user_roles","Log in as the user; inspect scope in response","Scope data is returned; combined scope reflects assigned roles"
+AT-03,AT-03,Permission cache behavior,"User has an active role; permission cache is empty","Log in once; repeat the same protected request","First access loads permissions into cache; second access uses cached permissions; access result remains consistent"
+AT-04,AT-04,Permission change invalidates access,"User has an active session; role or permission assignment is changed in the database","Change role/permission assignment; reuse the existing session; access a protected endpoint","Session is re-evaluated or revoked; access is denied if permissions are outdated"
+DB-01,DB-01,Flyway migration success,"Empty database schema","Start the application","Flyway applies migrations successfully; required tables are created; application starts without schema errors"
+DB-02,DB-02,Redis connectivity,"Redis is running","Start the application; log in a user","Redis session is created successfully; no Redis connection error occurs"
+DB-03,DB-03,MailHog OTP delivery,"MailHog is running; registered user exists","Trigger forgot password; open MailHog UI","OTP email is visible in MailHog; email content contains expected OTP info"
+EC-01,EC-01,Missing cookie on protected endpoint,"None","Call a protected endpoint without session cookie","HTTP 401; authentication required response"
+EC-02,EC-02,Reused revoked session,"User logged in; then logged out","Reuse old cookie on protected endpoint","HTTP 401; session invalid or expired"
+EC-03,EC-03,Expired OTP reuse,"OTP exists and is allowed to expire","Wait for OTP expiry; attempt verify/reset with expired OTP","HTTP 400; OTP rejected"
+EC-04,EC-04,Multiple concurrent sessions,"None","Log in multiple times from different devices; exceed the configured concurrent session limit","Oldest session is revoked or new login is blocked according to policy"
+Notes,,,,"Use Postman collection variables for base URL and test credentials; use MailHog to inspect OTP emails; reset test data between runs if tests modify lockout/session state; start infrastructure before running request tests.",""
+Requirement,,,,
+No,Field,Type,Validation / Rule,Business Rule
+1,Email,Text,"Required. Must match email format ^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$",Must be unique in system
+2,Password,Text,"Required. Length 8–128 characters",Must be securely hashed
+3,First Name,Text,"Required. Length 1–100 characters",Cannot be blank
+4,Last Name,Text,"Required. Length 1–100 characters",Cannot be blank
+5,Phone Number,Text,"Optional. Format: ^(0\d{9}|\\+84\d{9})$",Must be a valid Vietnamese phone number
+6,Role,Text,"Required. Allowed values: ADMIN, USER, PARENT, TEACHER, DRIVER, KIOSK",Must exist in system
+7,OTP,Text,"Required for OTP flows. Numeric. Length 6 digits",Must be time-limited and single-use
+8,Session Cookie,Text,"Required after successful login. Must be HttpOnly and Secure",Must be stored in Redis-backed session
+9,Kiosk ID,Text,"Required for kiosk PIN/NFC login. Length 1–50 characters",Must be unique per kiosk device
+10,PIN,Text,"Required for kiosk PIN login. Length exactly 6 digits",Must match stored kiosk credentials
+11,Tag Code,Text,"Required for NFC scan login. Non-empty string",Must be unique and active
+12,Device Fingerprint,Text,"Required for authenticated sessions. Derived from headers",Must match stored session fingerprint
+Summary,,,,"This test set covers the current auth module behavior and the main business requirements described in the documentation.",""

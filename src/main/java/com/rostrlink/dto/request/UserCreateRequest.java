@@ -1,6 +1,6 @@
 package com.rostrlink.dto.request;
 
-import com.rostrlink.common.Role;
+import com.rostrlink.common.UserRole;
 import com.rostrlink.common.UserStatus;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -10,10 +10,6 @@ import lombok.*;
 @Getter
 @Setter
 public class UserCreateRequest {
-    @NotBlank(message = "Tên đăng nhập là bắt buộc")
-    @Size(min = 4, max = 20, message = "Tên đăng nhập có độ dài từ {min} đến {max}")
-    @Pattern(regexp = "^\\w+$", message = "Tên đăng nhập không được có kí tự đặc biệt")
-    private String username;
 
     @NotBlank(message = "Mật khẩu là bắt buộc")
     @Size(min = 2, message = "Mật khẩu phải có ít nhất {min} ký tự")
@@ -46,7 +42,7 @@ public class UserCreateRequest {
     private UserStatus status = UserStatus.ACTIVE;
 
     @NotNull(message = "Vai trò là bắt buộc")
-    private Role role;
+    private UserRole userRole;
 
     private String avatarUrl;
 }

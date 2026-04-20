@@ -1,0 +1,34 @@
+Module Code,Authentication & Authorization,,,,
+ID,Test Case Description,Pre-Condition,Test Case Procedure,Expected Output,Note
+TC001,Login with valid email and password,Active user account exists with valid credentials,"1. Navigate to login endpoint. 2. Enter Email. 3. Enter Password. 4. Submit request.",Login successful; session cookie issued; Redis session created,Normal Flow
+TC002,Submit login with empty fields,User can access login endpoint,1. Send login request with empty body.,Validation errors displayed for required fields,Validation
+TC003,Email empty on login,Active user account exists,1. Send login request with empty Email and valid Password.,System shows error for Email,Validation
+TC004,Email invalid format on login,Active user account exists,1. Send login request with Email = abc.com and valid Password.,Validation error displayed,Validation
+TC005,Email valid format on login,Active user account exists,1. Send login request with valid Email and Password.,Accepted,Valid
+TC006,Login using unregistered email,No account exists for provided email,1. Send login request with unknown Email and any Password.,Error message returned without revealing account existence,Security
+TC007,Password empty on login,Active user account exists,1. Send login request with valid Email and empty Password.,Validation error for Password,Validation
+TC008,Password too short on login,Active user account exists,1. Send login request with Password length < 8.,Validation error displayed,Boundary
+TC009,Password valid length on login,Active user account exists,1. Send login request with valid Password length.,Accepted,Boundary
+TC010,Password too long on login,Active user account exists,1. Send login request with Password length > 128.,Validation error displayed,Boundary
+TC011,Forgot password with registered email,Registered user exists; MailHog is running,1. Send forgot-password request with valid Email.,OTP generated and email sent,Normal Flow
+TC012,Forgot password with unregistered email,No account exists for provided email,1. Send forgot-password request with unknown Email.,Generic success response returned; no user enumeration,Security
+TC013,OTP verification with valid code,Valid OTP exists for user,1. Send verify-otp request with valid Email, OTP, and purpose.,OTP verified successfully,Normal Flow
+TC014,OTP verification with invalid code,OTP exists or test generates one,1. Send verify-otp request with invalid OTP.,Validation or invalid OTP error returned,Validation
+TC015,Password reset with valid OTP,Valid OTP exists for password reset,1. Send reset-password request with Email, valid OTP, and new password.,Password updated; all sessions revoked,Normal Flow
+TC016,Password reset with invalid OTP,User account exists,1. Send reset-password request with invalid OTP.,Reset rejected; password unchanged,Security
+TC017,Kiosk PIN login with valid PIN,Kiosk account exists and valid PIN is known,1. Send kiosk PIN login request with valid Kiosk ID and PIN.,Kiosk session created successfully,Normal Flow
+TC018,Kiosk PIN login with invalid PIN,Kiosk account exists,1. Send kiosk PIN login request with wrong PIN.,Error returned; no session created,Security
+TC019,NFC scan login with valid tag,NFC tag exists and is active,1. Send NFC scan request with valid Kiosk ID and Tag Code.,Login successful; kiosk session created,Normal Flow
+TC020,NFC scan login with revoked tag,Tag is revoked or invalid,1. Send NFC scan request with revoked Tag Code.,Access denied; no session created,Security
+TC021,Logout after login,User is logged in and session cookie exists,1. Send logout request with valid session cookie.,Session removed from Redis; cookie cleared,Normal Flow
+TC022,Access /auth/me after login,User is logged in,1. Send GET /auth/me with session cookie.,Current Redis session returned,Normal Flow
+TC023,Access protected endpoint without cookie,None,1. Call protected endpoint without session cookie.,HTTP 401 authentication required,Negative
+TC024,Reuse revoked session,User logged in and then logged out,1. Reuse old session cookie on protected endpoint.,HTTP 401 session invalid/expired,Negative
+TC025,Expired OTP reuse,OTP has expired,1. Submit expired OTP to verify/reset endpoint.,HTTP 400 OTP rejected,Negative
+TC026,Device fingerprint mismatch,Active session exists and is bound to fingerprint,1. Reuse session from different device fingerprint.,HTTP 403 device mismatch,Security
+TC027,Rate limit by IP,Rate limit enabled,1. Send multiple login requests from same IP within window.,HTTP 429 returned after threshold,Security
+TC028,Validation error for malformed JSON,Validation enabled on endpoint,1. Send malformed request body to validated endpoint.,HTTP 400 validation error details returned,Validation
+TC029,Role loading for active user,User has active roles,1. Login as user and inspect response roles.,Active roles returned; inactive roles excluded,Authorization
+TC030,Context scope loaded for user,User has scoped role assignments,1. Login and inspect scope field.,Scope data returned and merged correctly,Authorization
+TC031,Permission cache behavior,User has active role and cache empty,1. Perform protected access twice.,First access loads permissions; second access uses cache,Performance
+TC032,Permission change invalidates access,User has active session and permissions changed in DB,1. Change role/permission; reuse existing session; call protected endpoint.,Session is re-evaluated or revoked,Authorization

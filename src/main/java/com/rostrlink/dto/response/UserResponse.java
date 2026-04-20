@@ -1,6 +1,6 @@
 package com.rostrlink.dto.response;
 
-import com.rostrlink.common.Role;
+import com.rostrlink.common.UserRole;
 import com.rostrlink.common.UserStatus;
 import lombok.*;
 
@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
 public class UserResponse {
     private Integer userId;
 
-    private String username;
-
     private String firstName;
 
     private String lastName;
@@ -26,7 +24,7 @@ public class UserResponse {
 
     private UserStatus status;
 
-    private Role role;
+    private UserRole userRole;
 
     private LocalDateTime createdDate;
 

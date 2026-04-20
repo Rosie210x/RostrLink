@@ -1,6 +1,6 @@
 package com.rostrlink.dto.request;
 
-import com.rostrlink.common.Role;
+import com.rostrlink.common.UserRole;
 import com.rostrlink.common.UserStatus;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -12,8 +12,6 @@ import lombok.*;
 @Setter
 public class UserUpdateRequest {
     private Integer userId;
-
-    private String username;
 
     @NotBlank(message = "Mật khẩu là bắt buộc")
     @Size(min = 2, message = "Mật khẩu phải có ít nhất {min} ký tự")
@@ -45,7 +43,7 @@ public class UserUpdateRequest {
     private String phoneNumber;
 
     @NotNull(message = "Vai trò là bắt buộc")
-    private Role role;
+    private UserRole userRole;
 
     private UserStatus status;
 

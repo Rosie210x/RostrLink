@@ -9,7 +9,22 @@ aws:
 spring:
   profiles:
     active: dev
-
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  mail:
+    host: localhost
+    port: 1025        # MailHog SMTP
+    username: ""
+    password: ""
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
 # Optional: localstack for dev
 localstack:
   enabled: false

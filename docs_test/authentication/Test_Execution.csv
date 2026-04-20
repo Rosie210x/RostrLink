@@ -1,0 +1,37 @@
+Test Execution,,,,,,
+,,,,,,
+Module Code,Authentication & Authorization,,,,,
+ID,Expected Output,Actual Result,Result,Bug#,"Test date
+(dd/mm/yyyy)",Note
+TC001,Login successful; session cookie issued; Redis session created,Login successful; session cookie issued; Redis session created,Pass,N/A,11/3/2026,Normal Flow
+TC002,Validation errors displayed for required fields,System displays validation errors for required fields,Pass,N/A,11/3/2026,Validation
+TC003,System shows error for Email,System shows error for Email,Pass,N/A,11/3/2026,Validation
+TC004,Validation error displayed,System displays format validation error,Pass,N/A,11/3/2026,Validation
+TC005,Accepted,Accepted,Pass,N/A,11/3/2026,Valid
+TC006,Generic invalid credentials response returned,System still reveals account not found in response,Fail,BUG001,11/3/2026,Security
+TC007,Validation error for Password,System displays password validation error,Pass,N/A,11/3/2026,Validation
+TC008,Validation error displayed,System displays length validation error,Pass,N/A,11/3/2026,Boundary
+TC009,Accepted,Accepted,Pass,N/A,11/3/2026,Boundary
+TC010,Validation error displayed,System accepts overlong password,Fail,BUG002,11/3/2026,Boundary
+TC011,OTP generated and email sent,OTP generated and email sent,Pass,N/A,11/3/2026,Normal Flow
+TC012,Generic success response returned; no user enumeration,Generic success response returned,Pass,N/A,11/3/2026,Security
+TC013,OTP verified successfully,OTP verified successfully,Pass,N/A,11/3/2026,Normal Flow
+TC014,Invalid OTP error returned,Invalid OTP error returned,Pass,N/A,11/3/2026,Validation
+TC015,Password updated; all sessions revoked,Password updated; all sessions revoked,Pass,N/A,11/3/2026,Normal Flow
+TC016,Reset rejected; password unchanged,Reset rejected; password unchanged,Pass,N/A,11/3/2026,Security
+TC017,Kiosk session created successfully,Kiosk session created successfully,Pass,N/A,11/3/2026,Normal Flow
+TC018,Error returned; no session created,Error returned; no session created,Pass,N/A,11/3/2026,Security
+TC019,Login successful; kiosk session created,Login successful; kiosk session created,Pass,N/A,11/3/2026,Normal Flow
+TC020,Access denied; no session created,Access denied; no session created,Pass,N/A,11/3/2026,Security
+TC021,Session removed from Redis; cookie cleared,Session removed from Redis; cookie cleared,Pass,N/A,11/3/2026,Normal Flow
+TC022,Current Redis session returned,Current Redis session returned,Pass,N/A,11/3/2026,Normal Flow
+TC023,HTTP 401 authentication required,HTTP 401 authentication required,Pass,N/A,11/3/2026,Negative
+TC024,HTTP 401 session invalid/expired,HTTP 401 session invalid/expired,Pass,N/A,11/3/2026,Negative
+TC025,HTTP 400 OTP rejected,HTTP 400 OTP rejected,Pass,N/A,11/3/2026,Negative
+TC026,HTTP 403 device mismatch,HTTP 403 device mismatch,Pass,N/A,11/3/2026,Security
+TC027,HTTP 429 returned after threshold,HTTP 429 returned after threshold,Pass,N/A,11/3/2026,Security
+TC028,HTTP 400 validation error details returned,HTTP 400 validation error details returned,Pass,N/A,11/3/2026,Validation
+TC029,Active roles returned; inactive roles excluded,Active roles returned; inactive roles excluded,Pass,N/A,11/3/2026,Authorization
+TC030,Scope data returned and merged correctly,Scope data returned and merged correctly,Pass,N/A,11/3/2026,Authorization
+TC031,First access loads permissions; second access uses cache,First access loads permissions; second access uses cache,Pass,N/A,11/3/2026,Performance
+TC032,Session is re-evaluated or revoked,Session is re-evaluated or revoked,Pass,N/A,11/3/2026,Authorization

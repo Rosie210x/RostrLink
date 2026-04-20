@@ -1,0 +1,46 @@
+Req ID,Field,Validation Rule,Partition,Test Data,Boundary,Related TC
+REQ00,All fields,All fields valid,Valid,valid login form,–,TC001
+REQ00,All fields,Required fields cannot be empty,Invalid,empty login form,–,TC002
+REQ01,Email,Required,Invalid,empty email,–,TC003
+REQ01,Email,"Format ^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$",Invalid,abc.com,–,TC004
+REQ01,Email,Format valid,Valid,abc@company.com,–,TC005
+REQ01,Email,Must be unique,Invalid,existing email,–,TC006
+REQ02,Password,Required,Invalid,empty password,–,TC007
+REQ02,Password,Length 8–128 characters,Invalid,short,Min-1,TC008
+REQ02,Password,Length 8–128 characters,Valid,ValidPass1!,Min,TC009
+REQ02,Password,Length 8–128 characters,Invalid,129 chars,Max+1,TC010
+REQ03,First Name,Required,Invalid,empty,–,TC011
+REQ03,First Name,Length 1–100 characters,Invalid,0 chars,Min-1,TC012
+REQ03,First Name,Length 1–100 characters,Valid,Nguyen,Min,TC013
+REQ03,First Name,Length 1–100 characters,Invalid,101 chars,Max+1,TC014
+REQ04,Last Name,Required,Invalid,empty,–,TC015
+REQ04,Last Name,Length 1–100 characters,Invalid,0 chars,Min-1,TC016
+REQ04,Last Name,Length 1–100 characters,Valid,Van A,Min,TC017
+REQ04,Last Name,Length 1–100 characters,Invalid,101 chars,Max+1,TC018
+REQ05,Phone Number,"Optional, format ^(0\d{9}|\\+84\d{9})$",Invalid,123ABC,–,TC019
+REQ05,Phone Number,Valid format,Valid,0912345678,–,TC020
+REQ06,Role,Required,Invalid,empty,–,TC021
+REQ06,Role,Allowed value,Valid,ADMIN,–,TC022
+REQ06,Role,Allowed value,Valid,USER,–,TC023
+REQ06,Role,Allowed value,Valid,PARENT,–,TC024
+REQ06,Role,Allowed value,Valid,TEACHER,–,TC025
+REQ06,Role,Allowed value,Valid,DRIVER,–,TC026
+REQ06,Role,Allowed value,Valid,KIOSK,–,TC027
+REQ07,OTP,Required for OTP flows,Invalid,empty OTP,–,TC028
+REQ07,OTP,Numeric 6 digits,Invalid,12AB56,–,TC029
+REQ07,OTP,Numeric 6 digits,Valid,123456,–,TC030
+REQ07,OTP,Single-use and time-limited,Invalid,reused OTP,–,TC031
+REQ08,Session Cookie,Must be set after login,Valid,login success,–,TC032
+REQ08,Session Cookie,HttpOnly and Secure,Valid,secure cookie,–,TC033
+REQ08,Session Cookie,Missing/expired session,Invalid,no cookie,–,TC034
+REQ09,Kiosk ID,Required,Invalid,empty kiosk id,–,TC035
+REQ09,Kiosk ID,Length 1–50 characters,Valid,KIOSK01,Min,TC036
+REQ10,PIN,Required for kiosk PIN login,Invalid,empty pin,–,TC037
+REQ10,PIN,Exactly 6 digits,Invalid,12345,Min-1,TC038
+REQ10,PIN,Exactly 6 digits,Valid,123456,Exact,TC039
+REQ10,PIN,Exactly 6 digits,Invalid,1234567,Max+1,TC040
+REQ11,Tag Code,Required for NFC login,Invalid,empty tag code,–,TC041
+REQ11,Tag Code,Active and unique tag,Valid,NFC-001,–,TC042
+REQ11,Tag Code,Revoked tag,Invalid,revoked tag,–,TC043
+REQ12,Device Fingerprint,Must match session fingerprint,Invalid,device mismatch,–,TC044
+REQ12,Device Fingerprint,Matches authenticated session,Valid,matched fingerprint,–,TC045
