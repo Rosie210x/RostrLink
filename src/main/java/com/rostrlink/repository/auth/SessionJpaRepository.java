@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface SessionRepository extends JpaRepository<Session, UUID> {
+public interface SessionJpaRepository extends JpaRepository<Session, UUID> {
 
     List<Session> findByUser_UserIdAndRevokedAtIsNull(Long userId);
 

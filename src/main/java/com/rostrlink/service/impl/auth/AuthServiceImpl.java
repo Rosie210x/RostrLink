@@ -22,7 +22,7 @@ import com.rostrlink.repository.UserRepository;
 import com.rostrlink.repository.auth.DeviceRepository;
 import com.rostrlink.repository.auth.LoginAttemptRepository;
 import com.rostrlink.repository.auth.NfcTagRepository;
-import com.rostrlink.repository.auth.SessionRepository;
+import com.rostrlink.repository.auth.SessionJpaRepository;
 import com.rostrlink.service.AuthService;
 import com.rostrlink.util.CookieUtil;
 import com.rostrlink.util.DeviceFingerprintUtil;
@@ -51,7 +51,7 @@ import java.util.UUID;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
-    private final SessionRepository sessionRepository;
+    private final SessionJpaRepository sessionRepository;
     private final LoginAttemptRepository loginAttemptRepository;
     private final DeviceRepository deviceRepository;
     private final NfcTagRepository nfcTagRepository;

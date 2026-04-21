@@ -1,0 +1,27 @@
+# PostgreSQL (replace with real values in your local .env)
+POSTGRES_DB=your_database_name
+POSTGRES_USER=your_username
+POSTGRES_PASSWORD=your_password
+
+# Ports (optional overrides)
+POSTGRES_PORT=5432
+REDIS_PORT=6379
+MAILHOG_SMTP_PORT=1025
+MAILHOG_UI_PORT=8025
+APP_PORT=8080
+
+# Spring / App
+SPRING_PROFILES_ACTIVE=
+SPRING_DATASOURCE_URL=your_database_url
+SPRING_DATASOURCE_USERNAME=sa
+SPRING_DATASOURCE_PASSWORD=your_password
+
+# Redis
+REDIS_HOST=your_redis_host
+REDIS_PORT=6379
+
+# Mail
+SPRING_MAIL_HOST=mailhog
+SPRING_MAIL_PORT=1025
+SPRING_MAIL_USERNAME=your_password
+SPRING_MAIL_PASSWORD=your_password

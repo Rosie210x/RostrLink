@@ -23,7 +23,7 @@ public class LoginAttempt {
     @ToString.Exclude
     private User user;
 
-    /** The email or username that was submitted */
+    /** The email that was submitted */
     @Column(name = "identifier")
     private String identifier;
 

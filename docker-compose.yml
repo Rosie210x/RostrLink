@@ -1,30 +1,30 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16
-    container_name: rostrlink-postgres
+    container_name: my-postgres
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-rostrlink}
-      POSTGRES_USER: ${POSTGRES_USER:-rostrlink}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rostrlink123}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rostrlink} -d ${POSTGRES_DB:-rostrlink}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 10
 
   redis:
     image: redis:7
-    container_name: rostrlink-redis
+    container_name: my-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -33,30 +33,36 @@ services:
 
   mailhog:
     image: mailhog/mailhog
-    container_name: rostrlink-mailhog
-    ports:
-      - "1025:1025"
-      - "8025:8025"
+    container_name: my-mailhog
     restart: unless-stopped
+    ports:
+      - "${MAILHOG_SMTP_PORT}:1025"
+      - "${MAILHOG_UI_PORT}:8025"
 
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: rostrlink-app
+    container_name: my-app
     restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_started
+    env_file:
+      - .env
     environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-rostrlink}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-rostrlink}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-rostrlink123}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      SPRING_MAIL_HOST: ${SPRING_MAIL_HOST}
+      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT}
     ports:
-      - "8080:8080"
+      - "${APP_PORT}:8080"
 
 volumes:
   postgres_data:
