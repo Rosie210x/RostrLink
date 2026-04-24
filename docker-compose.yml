@@ -1,8 +1,7 @@
 services:
   postgres:
-    image: postgres:16
+    image: postgres:18
     container_name: my-postgres
-    restart: unless-stopped
     env_file:
       - .env
     environment:
@@ -22,7 +21,6 @@ services:
   redis:
     image: redis:7
     container_name: my-redis
-    restart: unless-stopped
     ports:
       - "${REDIS_PORT}:6379"
     healthcheck:
@@ -34,7 +32,6 @@ services:
   mailhog:
     image: mailhog/mailhog
     container_name: my-mailhog
-    restart: unless-stopped
     ports:
       - "${MAILHOG_SMTP_PORT}:1025"
       - "${MAILHOG_UI_PORT}:8025"
@@ -44,7 +41,6 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: my-app
-    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy

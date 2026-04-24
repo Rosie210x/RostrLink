@@ -38,7 +38,6 @@ C:\Project\RostrLink\src\main\java\com\rostrlink\dto\request\auth\VerifyOtpReque
 C:\Project\RostrLink\src\main\java\com\rostrlink\dto\response\DeviceInfo.java
 C:\Project\RostrLink\src\main\java\com\rostrlink\common\UserRole.java
 C:\Project\RostrLink\src\main\java\com\rostrlink\exception\NotFoundException.java
-C:\Project\RostrLink\src\main\java\com\rostrlink\repository\UserRepository.java
 C:\Project\RostrLink\src\main\java\com\rostrlink\auth\config\RedisConfig.java
 C:\Project\RostrLink\src\main\java\com\rostrlink\repository\auth\NfcTagRepository.java
 C:\Project\RostrLink\src\main\java\com\rostrlink\dto\request\UserUpdateRequest.java
@@ -55,7 +54,7 @@ C:\Project\RostrLink\src\main\java\com\rostrlink\dto\response\MeResponse.java
 C:\Project\RostrLink\src\main\java\com\rostrlink\repository\auth\RoleRepository.java
 C:\Project\RostrLink\src\main\java\com\rostrlink\entity\StudentParent.java
 C:\Project\RostrLink\src\main\java\com\rostrlink\entity\auth\UserRole.java
-C:\Project\RostrLink\src\main\java\com\rostrlink\api\JsonResponse.java
+C:\Project\RostrLink\src\main\java\com\rostrlink\repository\auth\UserRepository.java
 C:\Project\RostrLink\src\main\java\com\rostrlink\dto\request\auth\NfcScanRequest.java
 C:\Project\RostrLink\src\main\java\com\rostrlink\repository\auth\DeviceRepository.java
 C:\Project\RostrLink\src\main\java\com\rostrlink\exception\auth\RateLimitExceededException.java

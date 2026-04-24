@@ -1,4 +1,3 @@
-com\rostrlink\api\JsonResponse.class
 com\rostrlink\repository\auth\RolePermissionRepository.class
 com\rostrlink\entity\Parent$ParentBuilder.class
 com\rostrlink\common\UserStatus.class
@@ -14,8 +13,6 @@ com\rostrlink\auth\config\AppProperties$Login.class
 com\rostrlink\exception\auth\InvalidOtpException.class
 com\rostrlink\dto\response\ApiResponse.class
 com\rostrlink\entity\StudentParent$StudentParentBuilder.class
-com\rostrlink\api\JsonResponse$JsonResponseBuilder.class
-com\rostrlink\repository\UserRepository.class
 com\rostrlink\entity\auth\Device$DeviceBuilder.class
 com\rostrlink\entity\auth\Permission.class
 com\rostrlink\dto\request\auth\ForgotPasswordRequest.class
@@ -72,6 +69,7 @@ com\rostrlink\exception\ValidationException.class
 com\rostrlink\entity\auth\UserRole.class
 com\rostrlink\entity\StudentClass$StudentClassBuilder.class
 com\rostrlink\exception\auth\OtpThrottledException.class
+com\rostrlink\repository\auth\UserRepository.class
 com\rostrlink\entity\auth\LoginAttempt.class
 com\rostrlink\controller\AuthController.class
 com\rostrlink\entity\Driver$DriverBuilder.class

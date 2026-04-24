@@ -2,7 +2,11 @@ package com.rostrlink.entity.auth;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnTransformer;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
+import java.net.InetAddress;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -28,6 +32,10 @@ public class LoginAttempt {
     private String identifier;
 
     @Column(name = "ip_address", columnDefinition = "inet")
+    @ColumnTransformer(
+            read  = "ip_address::text",
+            write = "?::inet"
+    )
     private String ipAddress;
 
     @Column(name = "device_fingerprint")

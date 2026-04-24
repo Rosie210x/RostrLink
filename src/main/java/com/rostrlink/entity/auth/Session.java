@@ -2,6 +2,7 @@ package com.rostrlink.entity.auth;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -36,6 +37,7 @@ public class Session {
     private String deviceFingerprint;
 
     @Column(name = "ip_address", columnDefinition = "inet")
+    @ColumnTransformer(read = "ip_address::text", write = "?::inet")
     private String ipAddress;
 
     @Column(name = "created_at", updatable = false)

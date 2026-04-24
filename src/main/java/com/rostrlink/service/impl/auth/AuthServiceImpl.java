@@ -18,7 +18,7 @@ import com.rostrlink.exception.auth.AccountLockedException;
 import com.rostrlink.exception.auth.InvalidCredentialsException;
 import com.rostrlink.exception.auth.UserNotFoundException;
 import com.rostrlink.redis.RedisSession;
-import com.rostrlink.repository.UserRepository;
+import com.rostrlink.repository.auth.UserRepository;
 import com.rostrlink.repository.auth.DeviceRepository;
 import com.rostrlink.repository.auth.LoginAttemptRepository;
 import com.rostrlink.repository.auth.NfcTagRepository;

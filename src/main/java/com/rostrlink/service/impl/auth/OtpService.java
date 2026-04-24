@@ -7,7 +7,7 @@ import com.rostrlink.exception.auth.UserNotFoundException;
 import com.rostrlink.entity.auth.OtpToken;
 import com.rostrlink.entity.auth.User;
 import com.rostrlink.repository.auth.OtpTokenRepository;
-import com.rostrlink.repository.UserRepository;
+import com.rostrlink.repository.auth.UserRepository;
 import com.rostrlink.util.OtpUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

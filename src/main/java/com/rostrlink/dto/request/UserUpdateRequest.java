@@ -17,7 +17,6 @@ public class UserUpdateRequest {
     @Size(min = 2, message = "Mật khẩu phải có ít nhất {min} ký tự")
     private String password;
 
-
     @NotBlank(message = "Tên là bắt buộc")
     @Pattern(
             regexp = "^(\\p{Lu}\\p{Ll}+)(\\s\\p{Lu}\\p{Ll}+)*$",

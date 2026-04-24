@@ -1,0 +1,308 @@
+openapi: 3.0.3
+info:
+  title: RostrLink API
+  version: 1.0.0
+  description: Authentication API for RostrLink
+
+servers:
+  - url: /api
+    description: Default server
+
+tags:
+  - name: Auth
+    description: Authentication and session management
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login
+      description: Authenticate user with credentials. Sets a session cookie on success.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponseWrapper'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout
+      description: Invalidate the current session and clear the session cookie.
+      operationId: logout
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoidResponseWrapper'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Forgot password
+      description: Send an OTP to the user's registered email for password reset.
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '200':
+          description: OTP sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoidResponseWrapper'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /auth/verify-otp:
+    post:
+      tags: [Auth]
+      summary: Verify OTP
+      description: Verify the OTP code sent to the user's email.
+      operationId: verifyOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyOtpRequest'
+      responses:
+        '200':
+          description: OTP verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoidResponseWrapper'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Reset password
+      description: Set a new password after OTP verification.
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoidResponseWrapper'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get current session
+      description: Return the current authenticated user's session information from Redis.
+      operationId: me
+      responses:
+        '200':
+          description: Session data retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedisSessionWrapper'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  schemas:
+
+    # ─── Requests ───────────────────────────────────────────────
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          example: john.doe@example.com
+        password:
+          type: string
+          format: password
+          example: Secret@123
+
+    ForgotPasswordRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+
+    VerifyOtpRequest:
+      type: object
+      required: [email, otp]
+      properties:
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        otp:
+          type: string
+          example: "123456"
+
+    ResetPasswordRequest:
+      type: object
+      required: [email, otp, newPassword]
+      properties:
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        otp:
+          type: string
+          example: "123456"
+        newPassword:
+          type: string
+          format: password
+          example: NewSecret@123
+
+    # ─── Response Payloads ──────────────────────────────────────
+
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        tokenType:
+          type: string
+          example: Bearer
+        expiresIn:
+          type: integer
+          description: Token TTL in seconds
+          example: 3600
+
+    RedisSession:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          example: sess_abc123
+        userId:
+          type: string
+          example: usr_xyz789
+        username:
+          type: string
+          example: john.doe@example.com
+        roles:
+          type: array
+          items:
+            type: string
+          example: [ROLE_USER]
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+
+    # ─── Wrapped Responses (ApiResponse<T>) ─────────────────────
+
+    LoginResponseWrapper:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Login successful
+        data:
+          $ref: '#/components/schemas/LoginResponse'
+
+    RedisSessionWrapper:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: OK
+        data:
+          $ref: '#/components/schemas/RedisSession'
+
+    VoidResponseWrapper:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: OK
+        data:
+          nullable: true
+          example: null
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Validation failed
+        data:
+          nullable: true
+          example: null
+
+  # ─── Reusable Responses ───────────────────────────────────────
+
+  responses:
+    BadRequest:
+      description: Invalid request payload or validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: Missing or invalid authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
