@@ -2,7 +2,7 @@ package com.rostrlink.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rostrlink.auth.config.AppProperties;
-import com.rostrlink.dto.response.ApiResponse;
+import com.rostrlink.dto.response.auth.ApiResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

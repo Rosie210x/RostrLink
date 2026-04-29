@@ -14,7 +14,7 @@ public class LoginRequest {
     @NotBlank @Size(min = 8, max = 128)
     private String password;
 
-    private String deviceInfo;
+    private DeviceInfo deviceInfo;
     /** Optional: client-side fingerprint hash (UA + device-id + hints) */
     private String clientFingerprint;
 }

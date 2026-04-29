@@ -1,4 +1,4 @@
-package com.rostrlink.dto.response;
+package com.rostrlink.dto.response.auth;
 
 import lombok.Data;
 import java.time.Instant;

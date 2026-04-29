@@ -1,6 +1,7 @@
 package com.rostrlink.service.impl.auth;
 
 import com.rostrlink.auth.config.AppProperties;
+import com.rostrlink.common.ResetChannel;
 import com.rostrlink.exception.auth.InvalidOtpException;
 import com.rostrlink.exception.auth.OtpThrottledException;
 import com.rostrlink.exception.auth.UserNotFoundException;
@@ -34,7 +35,7 @@ public class OtpService {
     // ── Send OTP ──────────────────────────────────────────────────────────────
 
     @Transactional
-    public void sendOtp(String email, String purpose, String channel) {
+    public void sendOtp(String email, String purpose, ResetChannel channel) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
 
@@ -54,14 +55,14 @@ public class OtpService {
                 .user(user)
                 .otpHash(hashed)
                 .purpose(purpose)
-                .channel(channel)
+                .channel(channel)   // stored as lower-case string in DB
                 .expiresAt(OffsetDateTime.now().plusMinutes(props.getOtp().getTtlMinutes()))
                 .build();
 
         otpTokenRepository.save(token);
 
         dispatch(user, raw, purpose, channel);
-        log.info("OTP sent to user {} for purpose {}", user.getUserId(), purpose);
+        log.info("OTP sent to user {} via {} for purpose {}", user.getUserId(), channel, purpose);
     }
 
     // ── Verify OTP ────────────────────────────────────────────────────────────
@@ -86,13 +87,10 @@ public class OtpService {
 
     // ── Dispatch ──────────────────────────────────────────────────────────────
 
-    private void dispatch(User user, String otp, String purpose, String channel) {
-        if ("email".equalsIgnoreCase(channel)) {
-            sendEmail(user.getEmail(), otp, purpose);
-        } else if ("sms".equalsIgnoreCase(channel)) {
-            sendSms(user.getPhoneNumber(), otp);
-        } else {
-            sendEmail(user.getEmail(), otp, purpose);
+    private void dispatch(User user, String otp, String purpose, ResetChannel channel) {
+        switch (channel) {
+            case SMS   -> sendSms(user.getPhoneNumber(), otp);
+            case EMAIL -> sendEmail(user.getEmail(), otp, purpose);
         }
     }
 

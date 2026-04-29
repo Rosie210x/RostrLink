@@ -12,7 +12,7 @@ spring:
       port: ${REDIS_PORT:6379}
 
   mail:
-    host: ${SPRING_MAIL_HOST:mailhog}
+    host: ${SPRING_MAIL_HOST:localhost}
     port: ${SPRING_MAIL_PORT:1025}
 
 management:

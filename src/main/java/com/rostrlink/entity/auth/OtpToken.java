@@ -1,8 +1,11 @@
 package com.rostrlink.entity.auth;
+
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.OffsetDateTime;
+
+import com.rostrlink.common.ResetChannel;
 
 @Entity
 @Table(name = "otp_tokens")
@@ -29,9 +32,12 @@ public class OtpToken {
     @Builder.Default
     private String purpose = "password_reset";
 
-    /** "email" | "sms" */
+    /**
+     * Delivery channel — stored as lower-case string matching
+     * {@link com.rostrlink.common.ResetChannel}.
+     */
     @Column(name = "channel")
-    private String channel;
+    private ResetChannel channel;
 
     @Column(name = "created_at", updatable = false)
     @Builder.Default

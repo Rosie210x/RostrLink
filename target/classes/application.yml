@@ -44,9 +44,11 @@ app:
     login:
       max-attempts: 5
       lockout-minutes: 15
+      rate-limit-window-seconds: 60
+      rate-limit-ip-max: 5  # chặn sau 5 requests
     otp:
       ttl-minutes: 10
-      max-sends-per-hour: 3
+      max-sends-per-hour: 100
 
 aws:
   region: ap-southeast-1

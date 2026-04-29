@@ -1,10 +1,10 @@
 package com.rostrlink.dto.response;
 
-import com.rostrlink.common.UserRole;
 import com.rostrlink.common.UserStatus;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserResponse {
-    private Integer userId;
+    private Long userId;
 
     private String firstName;
 
@@ -22,13 +22,15 @@ public class UserResponse {
 
     private String phoneNumber;
 
+    private String avatarUrl;
+
     private UserStatus status;
 
-    private UserRole userRole;
+    private List<String> roles;
 
-    private LocalDateTime createdDate;
+    private OffsetDateTime createdAt;
 
-    private LocalDateTime updatedDate;
+    private OffsetDateTime updatedAt;
 
     public String getFullName() {
         return firstName + " " + lastName;

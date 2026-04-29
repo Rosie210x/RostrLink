@@ -1,0 +1,13 @@
+No,Test Case ID,Description,Email,Password,FirstName,LastName,PhoneNumber,Role,Status,Scope,Expected Result,Note
+1,TC_USER_01,Create valid Admin,admin_test@rostrlink.com,Password123!,Van,Nguyen,0912345678,ADMIN,ACTIVE,{},Success,Valid Admin creation
+2,TC_USER_02,Create valid Teacher,teacher_test@rostrlink.com,Password123!,Thi,Tran,0987654321,TEACHER,ACTIVE,"{""class_ids"": [101]}",Success,Valid Teacher with scope
+3,TC_USER_03,Create valid Parent,parent_test@rostrlink.com,Password123!,Van,Pham,0909123456,PARENT,ACTIVE,"{""student_ids"": [501, 502]}",Success,Valid Parent with scope
+4,TC_USER_04,Create valid Driver,driver_test@rostrlink.com,Password123!,Thanh,Bui,0933112233,DRIVER,ACTIVE,"{""route_ids"": [301]}",Success,Valid Driver with scope
+5,TC_USER_05,Create valid Kiosk,kiosk_test@kiosk.internal,Password123!,Device,Kiosk,,KIOSK,ACTIVE,"{""kiosk_id"": ""K999""}",Success,Valid Kiosk creation
+6,TC_USER_06,Invalid Email Format,invalid-email,Password123!,John,Doe,0912345678,USER,ACTIVE,{},Fail (VALIDATION_FAILED),Email format check
+7,TC_USER_07,Duplicate Email,admin@rostrlink.com,Password123!,Duplicate,User,0912345678,USER,ACTIVE,{},Fail (EMAIL_EXISTS),Email uniqueness check
+8,TC_USER_08,Password too short,user@test.com,Pass1!,Small,Pass,0912345678,USER,ACTIVE,{},Fail (VALIDATION_FAILED),Min length 8 check
+9,TC_USER_09,Password no special char,user@test.com,Password123,No,Special,0912345678,USER,ACTIVE,{},Fail (VALIDATION_FAILED),Complexity policy check
+10,TC_USER_10,Invalid Phone Format,user@test.com,Password123!,Bad,Phone,12345,USER,ACTIVE,{},Fail (VALIDATION_FAILED),Vietnamese phone format check
+11,TC_USER_11,Partial update (Patch),teacher1@rostrlink.com,,UpdatedName,LastName,,TEACHER,ACTIVE,,Success,Verify null fields ignored
+12,TC_USER_12,Soft Delete,parent1@rostrlink.com,,,,,,,Success,Verify deleted_at is set

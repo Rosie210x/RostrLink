@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="rostrlink" uuid="d00c5a95-e63c-4efb-9bd4-6c6e620f74c5">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/postgres</jdbc-url>
-      <jdbc-additional-properties>
-        <property name="com.intellij.clouds.kubernetes.db.host.port" />
-        <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
-        <property name="com.intellij.clouds.kubernetes.db.container.port" />
-      </jdbc-additional-properties>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
     <data-source source="LOCAL" name="rostrlink@localhost" uuid="da79cc8e-264c-4467-8f10-138bcf85f3fb">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
@@ -25,7 +13,15 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="jdbc:postgresql://localhost:5432/rostrlink [DEBUG]" group="​App" uuid="74b15093-676e-4b0a-81fb-ffbfb1e3ecdf">
+    <data-source source="LOCAL" name="jdbc:postgresql://localhost:5432/rostrlink [DEBUG]" group="​App" uuid="9c20eab7-955b-4904-bea4-59248d387fff">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/rostrlink</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="jdbc:postgresql://localhost:5432/rostrlink [DEBUG]" group="​App" uuid="a71073f8-0a17-41cd-93e4-f156bb8f90b7">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <imported>true</imported>

@@ -12,7 +12,11 @@ import lombok.*;
 public class UserCreateRequest {
 
     @NotBlank(message = "Mật khẩu là bắt buộc")
-    @Size(min = 2, message = "Mật khẩu phải có ít nhất {min} ký tự")
+    @Size(min = 8, max = 128, message = "Mật khẩu phải có từ {min} đến {max} ký tự")
+    @Pattern(
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#+\\-_])[A-Za-z\\d@$!%*?&#+\\-_]{8,}$",
+            message = "Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số và 1 ký tự đặc biệt"
+    )
     private String password;
 
     @NotBlank(message = "Tên là bắt buộc")
@@ -46,4 +50,3 @@ public class UserCreateRequest {
 
     private String avatarUrl;
 }
-

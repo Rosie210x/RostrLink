@@ -1,10 +1,8 @@
-package com.rostrlink.dto.response;
+package com.rostrlink.dto.response.auth;
 
 import lombok.Data;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
 
 /** Returned by GET /auth/devices */
 @Data

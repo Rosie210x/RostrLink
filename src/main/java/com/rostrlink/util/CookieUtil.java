@@ -28,20 +28,16 @@ public class CookieUtil {
     public void writeSessionCookie(HttpServletResponse response,
                                    String sessionId,
                                    int maxAgeSeconds) {
-        Cookie cookie = new Cookie(SESSION_COOKIE, sessionId);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(secure);
-        cookie.setPath("/");
-        cookie.setMaxAge(maxAgeSeconds);
-        // SameSite must be set via header until Servlet 6.1 exposes it on Cookie
-        response.addCookie(cookie);
-        // Append SameSite attribute manually
-        response.addHeader("Set-Cookie",
-                String.format("%s=%s; Path=/; HttpOnly; %s; SameSite=%s; Max-Age=%d",
-                        SESSION_COOKIE, sessionId,
-                        secure ? "Secure;" : "",
-                        sameSite,
-                        maxAgeSeconds));
+        // Single Set-Cookie header with all attributes including SameSite
+        String cookieValue = String.format(
+                "%s=%s; Path=/; HttpOnly; Max-Age=%d; SameSite=%s%s",
+                SESSION_COOKIE,
+                sessionId,
+                maxAgeSeconds,
+                sameSite,
+                secure ? "; Secure" : ""
+        );
+        response.addHeader("Set-Cookie", cookieValue);
     }
 
     public void clearSessionCookie(HttpServletResponse response) {

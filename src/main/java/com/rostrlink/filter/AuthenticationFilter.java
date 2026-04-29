@@ -1,7 +1,7 @@
 package com.rostrlink.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rostrlink.dto.response.ApiResponse;
+import com.rostrlink.dto.response.auth.ApiResponse;
 import com.rostrlink.redis.RedisSession;
 import com.rostrlink.service.impl.auth.SessionService;
 import com.rostrlink.util.CookieUtil;
@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

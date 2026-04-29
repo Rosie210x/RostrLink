@@ -1,11 +1,8 @@
 package com.rostrlink.controller;
 
-import com.rostrlink.dto.request.auth.ForgotPasswordRequest;
-import com.rostrlink.dto.request.auth.LoginRequest;
-import com.rostrlink.dto.request.auth.ResetPasswordRequest;
-import com.rostrlink.dto.request.auth.VerifyOtpRequest;
-import com.rostrlink.dto.response.ApiResponse;
-import com.rostrlink.dto.response.LoginResponse;
+import com.rostrlink.dto.request.auth.*;
+import com.rostrlink.dto.response.auth.ApiResponse;
+import com.rostrlink.dto.response.auth.LoginResponse;
 import com.rostrlink.redis.RedisSession;
 import com.rostrlink.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,4 +51,11 @@ public class AuthController {
         RedisSession session = (RedisSession) request.getAttribute("redisSession");
         return ResponseEntity.ok(ApiResponse.ok(session));
     }
+
+    @PostMapping("/kiosk/pin-login")
+    public ResponseEntity<ApiResponse<LoginResponse>> loginKiosk(@Valid @RequestBody KioskPinLoginRequest req,
+                                                        HttpServletRequest request, HttpServletResponse response) {
+        return authService.kioskPinLogin(req, request, response);
+    }
+
 }

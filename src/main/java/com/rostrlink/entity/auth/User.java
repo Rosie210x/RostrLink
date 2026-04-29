@@ -1,5 +1,6 @@
 package com.rostrlink.entity.auth;
 
+import com.rostrlink.common.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,9 +41,10 @@ public class User {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     @Builder.Default
-    private String status = "active";
+    private UserStatus status = UserStatus.ACTIVE;
 
     @Column(name = "failed_attempt_count")
     @Builder.Default
@@ -51,6 +53,14 @@ public class User {
     @Column(name = "locked_until")
     private OffsetDateTime lockedUntil;
 
+    // ── Soft delete ──────────────────────────────────────────────────────
+    @Column(name = "deleted_at")
+    private OffsetDateTime deletedAt;
+
+    @Column(name = "deleted_by")
+    private Long deletedBy;
+
+    // ── Timestamps ───────────────────────────────────────────────────────
     @Column(name = "created_at", updatable = false)
     @Builder.Default
     private OffsetDateTime createdAt = OffsetDateTime.now();
@@ -64,8 +74,19 @@ public class User {
     @ToString.Exclude
     private Set<UserRole> userUserRoles = new HashSet<>();
 
+    @PrePersist
+    void onPersist() {
+        if (this.createdAt == null) this.createdAt = OffsetDateTime.now();
+        if (this.updatedAt == null) this.updatedAt = OffsetDateTime.now();
+    }
+
     @PreUpdate
     void onUpdate() {
         this.updatedAt = OffsetDateTime.now();
+    }
+
+    /** Convenience check for soft-delete state */
+    public boolean isDeleted() {
+        return this.deletedAt != null;
     }
 }

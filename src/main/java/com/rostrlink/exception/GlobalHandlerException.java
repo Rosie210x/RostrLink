@@ -1,6 +1,6 @@
 package com.rostrlink.exception;
 
-import com.rostrlink.dto.response.ApiResponse;
+import com.rostrlink.dto.response.auth.ApiResponse;
 import com.rostrlink.exception.auth.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

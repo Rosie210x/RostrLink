@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,8 +44,10 @@ public class PermissionService {
         for (String roleName : roleNames) {
             String cacheKey = ROLE_PERMISSIONS_PREFIX + roleName;
             Object cached = redisTemplate.opsForValue().get(cacheKey);
-            if (cached instanceof Set<?> s) {
-                result.addAll((Set<String>) s);
+            // Without global NON_FINAL typing the deserialised value is an ArrayList
+            // (JSON array → ArrayList), not a Set — so we check Collection<?> instead.
+            if (cached instanceof Collection<?> c) {
+                result.addAll((Collection<String>) c);
                 continue;
             }
 
@@ -115,5 +118,53 @@ public class PermissionService {
     public void invalidateUserScope(Long userId) {
         redisTemplate.delete(USER_SCOPE_PREFIX + userId);
         log.info("Invalidated scope cache for user {}", userId);
+    }
+
+    /**
+     * Validates that every scope key in the active {@code user_roles} rows for
+     * the given user is backed by at least one permission on the corresponding
+     * module.
+     *
+     * <p>
+     * A scope key {@code K} is considered backed if the user's role(s) have
+     * an allowed {@code role_permission} whose {@code module} matches {@code K}
+     * or {@code K} with a trailing {@code _ids}/{@code _id} suffix stripped.
+     *
+     * @param userId the user to validate
+     * @return {@code true} if all scope keys are backed; {@code false} if any
+     *         orphaned scope key is detected (details are logged as WARN)
+     */
+    public boolean validateUserScopeAgainstPermissions(Long userId) {
+        List<String> roleNames = getRoleNamesForUser(userId);
+        Set<String> allowedModules = new HashSet<>();
+        for (String roleName : roleNames) {
+            Role role = roleRepository.findByRoleName(roleName).orElse(null);
+            if (role == null)
+                continue;
+            rolePermissionRepository.findAllowedByRoleIds(List.of(role.getRoleId()))
+                    .forEach(rp -> allowedModules.add(rp.getPermission().getModule()));
+        }
+
+        Map<String, Object> scope = getUserScope(userId);
+        boolean valid = true;
+        for (String key : scope.keySet()) {
+            if (!isScopeBacked(key, allowedModules)) {
+                log.warn("User {}: scope key '{}' has no backing role_permission entry", userId, key);
+                valid = false;
+            }
+        }
+        return valid;
+    }
+
+    /** Mirrors the matching logic in {@link ScopePermissionValidator}. */
+    private boolean isScopeBacked(String scopeKey, Set<String> allowedModules) {
+        if (allowedModules.contains(scopeKey))
+            return true;
+        String stripped = scopeKey.endsWith("_ids")
+                ? scopeKey.substring(0, scopeKey.length() - 4)
+                : scopeKey.endsWith("_id")
+                        ? scopeKey.substring(0, scopeKey.length() - 3)
+                        : scopeKey;
+        return allowedModules.contains(stripped);
     }
 }

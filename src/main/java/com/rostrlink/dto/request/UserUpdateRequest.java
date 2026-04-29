@@ -5,16 +5,21 @@ import com.rostrlink.common.UserStatus;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-
+/**
+ * PUT /users/{id} — full update.
+ * Password is optional; when provided it must satisfy the complexity policy.
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 public class UserUpdateRequest {
-    private Integer userId;
 
-    @NotBlank(message = "Mật khẩu là bắt buộc")
-    @Size(min = 2, message = "Mật khẩu phải có ít nhất {min} ký tự")
+    @Size(min = 8, max = 128, message = "Mật khẩu phải có từ {min} đến {max} ký tự")
+    @Pattern(
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#+\\-_])[A-Za-z\\d@$!%*?&#+\\-_]{8,}$",
+            message = "Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số và 1 ký tự đặc biệt"
+    )
     private String password;
 
     @NotBlank(message = "Tên là bắt buộc")
@@ -46,5 +51,5 @@ public class UserUpdateRequest {
 
     private UserStatus status;
 
-    private String avatarURL;
-}
+    private String avatarUrl;
+}

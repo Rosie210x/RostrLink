@@ -1,8 +1,8 @@
 package com.rostrlink.service;
 
 import com.rostrlink.dto.request.auth.*;
-import com.rostrlink.dto.response.ApiResponse;
-import com.rostrlink.dto.response.LoginResponse;
+import com.rostrlink.dto.response.auth.ApiResponse;
+import com.rostrlink.dto.response.auth.LoginResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;

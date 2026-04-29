@@ -15,7 +15,7 @@ public class AppProperties {
 
     @Data
     public static class Session {
-        private long ttlSeconds = 3600;
+        private long ttlSeconds = 3600; //ttl: time to live = session duration = 1 hour
         private long kioskTtlSeconds = 28800;
         private int maxConcurrent = 5;
     }
@@ -32,7 +32,7 @@ public class AppProperties {
     @Data
     public static class Otp {
         private int ttlMinutes = 10;
-        private int maxSendsPerHour = 3;
+        private int maxSendsPerHour = 100;
         private int length = 6;
     }
 }

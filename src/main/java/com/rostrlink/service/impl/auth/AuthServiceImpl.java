@@ -1,14 +1,19 @@
 package com.rostrlink.service.impl.auth;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rostrlink.auth.config.AppProperties;
+import com.rostrlink.common.ResetChannel;
+import com.rostrlink.common.UserStatus;
+import com.rostrlink.dto.request.auth.DeviceInfo;
 import com.rostrlink.dto.request.auth.ForgotPasswordRequest;
 import com.rostrlink.dto.request.auth.KioskPinLoginRequest;
 import com.rostrlink.dto.request.auth.LoginRequest;
 import com.rostrlink.dto.request.auth.NfcScanRequest;
 import com.rostrlink.dto.request.auth.ResetPasswordRequest;
 import com.rostrlink.dto.request.auth.VerifyOtpRequest;
-import com.rostrlink.dto.response.ApiResponse;
-import com.rostrlink.dto.response.LoginResponse;
+import com.rostrlink.dto.response.auth.ApiResponse;
+import com.rostrlink.dto.response.auth.LoginResponse;
 import com.rostrlink.entity.auth.Device;
 import com.rostrlink.entity.auth.LoginAttempt;
 import com.rostrlink.entity.auth.NfcTag;
@@ -59,10 +64,12 @@ public class AuthServiceImpl implements AuthService {
     private final SessionService sessionService;
     private final PermissionService permissionService;
     private final OtpService otpService;
+    private final DeviceDetectionService deviceDetectionService;
 
     private final PasswordUtil passwordUtil;
     private final DeviceFingerprintUtil deviceFingerprintUtil;
     private final CookieUtil cookieUtil;
+    private final ObjectMapper objectMapper;
     private final AppProperties props;
 
     @Transactional
@@ -79,7 +86,7 @@ public class AuthServiceImpl implements AuthService {
                     throw new InvalidCredentialsException();
                 });
 
-        if (!"active".equals(user.getStatus())) {
+        if (!UserStatus.ACTIVE.equals(user.getStatus())){
             throw new AccountLockedException("Account is not active");
         }
         if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(OffsetDateTime.now())) {
@@ -93,7 +100,14 @@ public class AuthServiceImpl implements AuthService {
 
         resetFailedAttempts(user);
         recordAttempt(user, req.getIdentifier(), ip, fingerprint, true);
-        upsertDevice(user, fingerprint, req.getDeviceInfo());
+
+        // Merge client-supplied DeviceInfo with server-detected values, then
+        // serialize to JSON for storage in devices.device_info and sessions.device_info.
+        DeviceInfo serverInfo = deviceDetectionService.detect(httpReq);
+        DeviceInfo mergedInfo = deviceDetectionService.merge(req.getDeviceInfo(), serverInfo);
+        String deviceInfoJson = toJson(mergedInfo);
+
+        upsertDevice(user, fingerprint, deviceInfoJson);
 
         List<String> roleNames = permissionService.getRoleNamesForUser(user.getUserId());
         Map<String, Object> scope = permissionService.getUserScope(user.getUserId());
@@ -116,7 +130,7 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         String sessionId = sessionService.create(redisSession);
-        persistAuditSession(sessionId, user, "user", req.getDeviceInfo(), fingerprint, ip, expires, permVersion);
+        persistAuditSession(sessionId, user, "user", deviceInfoJson, fingerprint, ip, expires, permVersion);
         enforceConcurrentSessionLimit(user.getUserId());
         cookieUtil.writeSessionCookie(httpRes, sessionId, (int) props.getSession().getTtlSeconds());
 
@@ -179,7 +193,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(InvalidCredentialsException::new);
 
         User user = tag.getUser();
-        if (!"active".equals(user.getStatus())) {
+                if (!UserStatus.ACTIVE.equals(user.getStatus())) {
             throw new AccountLockedException("Account is not active");
         }
 
@@ -235,8 +249,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<ApiResponse<Void>> forgotPassword(ForgotPasswordRequest req) {
+        // Default to EMAIL when the client omits the channel field
+        ResetChannel channel = (req.getChannel() != null) ? req.getChannel() : ResetChannel.EMAIL;
         try {
-            otpService.sendOtp(req.getEmail(), "password_reset", req.getChannel());
+            otpService.sendOtp(req.getEmail(), "password_reset", channel);
         } catch (Exception e) {
             log.warn("Forgot-password OTP send failed for {}: {}", req.getEmail(), e.getMessage());
         }
@@ -299,16 +315,17 @@ public class AuthServiceImpl implements AuthService {
         loginAttemptRepository.save(attempt);
     }
 
-    private void upsertDevice(User user, String fingerprint, String deviceInfo) {
+    private void upsertDevice(User user, String fingerprint, String deviceInfoJson) {
         deviceRepository.findByUser_UserIdAndDeviceFingerprint(user.getUserId(), fingerprint)
                 .ifPresentOrElse(d -> {
                     d.setLastSeenAt(OffsetDateTime.now());
+                    d.setDeviceInfo(deviceInfoJson);
                     deviceRepository.save(d);
                 }, () -> {
                     Device d = Device.builder()
                             .user(user)
                             .deviceFingerprint(fingerprint)
-                            .deviceInfo(deviceInfo)
+                            .deviceInfo(deviceInfoJson)
                             .build();
                     deviceRepository.save(d);
                 });
@@ -369,5 +386,22 @@ public class AuthServiceImpl implements AuthService {
             return xff.split(",")[0].trim();
         }
         return request.getRemoteAddr();
+    }
+
+    /**
+     * Serialises a {@link DeviceInfo} DTO to a JSON string for storage
+     * in {@code devices.device_info} and {@code sessions.device_info}.
+     *
+     * <p>Returns {@code null} (rather than throwing) when serialisation fails
+     * so that a non-critical metadata error never blocks a login.
+     */
+    private String toJson(DeviceInfo info) {
+        if (info == null) return null;
+        try {
+            return objectMapper.writeValueAsString(info);
+        } catch (JsonProcessingException e) {
+            log.warn("Failed to serialise DeviceInfo to JSON: {}", e.getMessage());
+            return null;
+        }
     }
 }
